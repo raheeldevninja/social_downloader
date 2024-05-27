@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:social_downloader/features/download_videos/download_instagram_screen.dart';
+import 'package:social_downloader/features/download_videos/download_tik_tok_screen.dart';
+import 'package:social_downloader/features/download_videos/download_twitter_screen.dart';
 
 class SocialOptionsScreen extends StatelessWidget {
   const SocialOptionsScreen({super.key});
@@ -28,7 +31,16 @@ class SocialOptionsScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DownloadTikTokScreen(),
+                      ),
+                    );
+
+                  },
                   child: const Text(
                     'Download TikTok Videos',
                     style: TextStyle(
@@ -44,7 +56,16 @@ class SocialOptionsScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pinkAccent,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DownloadInstagramScreen(),
+                      ),
+                    );
+
+                  },
                   child: const Text(
                     'Download Instagram Videos',
                     style: TextStyle(
@@ -57,7 +78,19 @@ class SocialOptionsScreen extends StatelessWidget {
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DownloadTwitterScreen(),
+                      ),
+                    );
+
+                  },
                   child: const Text(
                     'Download Twitter Videos',
                     style: TextStyle(
