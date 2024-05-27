@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class DownloadTwitterScreen extends StatefulWidget {
   const DownloadTwitterScreen({super.key});
@@ -8,6 +9,10 @@ class DownloadTwitterScreen extends StatefulWidget {
 }
 
 class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
+
+  final _twitterVideoLinkController = TextEditingController();
+  ClipboardData? _clipboardData;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +50,7 @@ class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _twitterVideoLinkController,
                       decoration: InputDecoration(
                         hintText: 'Twitter video link',
                         //rounded corner border
@@ -74,7 +80,16 @@ class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+
+                        Clipboard.getData('text/plain').then((value) {
+                          setState(() {
+                            _clipboardData = value;
+                            _twitterVideoLinkController.text = _clipboardData?.text ?? '';
+                          });
+                        });
+
+                      },
                       child: const Text('Paste'),
                     ),
                   ),

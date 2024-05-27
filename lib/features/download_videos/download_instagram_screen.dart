@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class DownloadInstagramScreen extends StatefulWidget {
   const DownloadInstagramScreen({super.key});
@@ -8,6 +9,11 @@ class DownloadInstagramScreen extends StatefulWidget {
 }
 
 class _DownloadInstagramScreenState extends State<DownloadInstagramScreen> {
+
+  final _instagramVideoLinkController = TextEditingController();
+  ClipboardData? _clipboardData;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +51,7 @@ class _DownloadInstagramScreenState extends State<DownloadInstagramScreen> {
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _instagramVideoLinkController,
                       decoration: InputDecoration(
                         hintText: 'Instagram video link',
                         //rounded corner border
@@ -74,7 +81,14 @@ class _DownloadInstagramScreenState extends State<DownloadInstagramScreen> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Clipboard.getData('text/plain').then((value) {
+                          setState(() {
+                            _clipboardData = value;
+                            _instagramVideoLinkController.text = _clipboardData?.text ?? '';
+                          });
+                        });
+                      },
                       child: const Text('Paste'),
                     ),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class DownloadTikTokScreen extends StatefulWidget {
   const DownloadTikTokScreen({super.key});
@@ -8,6 +9,10 @@ class DownloadTikTokScreen extends StatefulWidget {
 }
 
 class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
+
+  final _tikTokVideoLinkController = TextEditingController();
+  ClipboardData? _clipboardData;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +50,7 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _tikTokVideoLinkController,
                       decoration: InputDecoration(
                         hintText: 'TikTok video link',
                         //rounded corner border
@@ -74,7 +80,14 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+
+                        _clipboardData = await Clipboard.getData('text/plain');
+                        setState(() {
+                          _tikTokVideoLinkController.text = _clipboardData!.text.toString();
+                        });
+
+                      },
                       child: const Text('Paste'),
                     ),
                   ),
