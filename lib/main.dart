@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:social_downloader/core/helpers/helper_functions.dart';
 import 'package:social_downloader/features/auth/login_screen.dart';
 import 'package:social_downloader/features/social_options/social_options_screen.dart';
 import 'package:social_downloader/features/view_model/download_save_provider.dart';
@@ -25,8 +26,34 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+
+  bool _isSignedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getUserLoggedInStatus();
+  }
+
+  _getUserLoggedInStatus() async {
+
+    HelperFunctions.getUserLoggedInStatus().then((value) {
+      setState(() {
+        _isSignedIn = value;
+      });
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +64,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      //home: const SocialOptionsScreen(),
-      home: const LoginScreen(),
+      home: _isSignedIn ? const SocialOptionsScreen() : const LoginScreen(),
     );
   }
 }

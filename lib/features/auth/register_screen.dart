@@ -1,6 +1,4 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:social_downloader/core/helpers/helper_functions.dart';
@@ -8,21 +6,20 @@ import 'package:social_downloader/core/ui/custom_app_bar.dart';
 import 'package:social_downloader/core/ui/input_decoration.dart';
 import 'package:social_downloader/core/ui/simple_button.dart';
 import 'package:social_downloader/core/utils/utils.dart';
-import 'package:social_downloader/features/auth/register_screen.dart';
 import 'package:social_downloader/features/auth/services/auth_service.dart';
-import 'package:social_downloader/features/auth/services/database_service.dart';
 import 'package:social_downloader/features/social_options/social_options_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  String fullName = '';
   String email = '';
   String password = '';
 
@@ -34,19 +31,41 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: 'Login',
-        shouldShowBack: false,
+        title: 'Register',
+        shouldShowBack: true,
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Colors.black),
-            )
+          ? Center(
+              child: CircularProgressIndicator(
+              color: Theme.of(context).primaryColor,
+            ))
           : Form(
-            key: _formKey,
+        key: _formKey,
             child: ListView(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20.0, vertical: 80),
                 children: [
+                  TextFormField(
+                    keyboardType: TextInputType.text,
+                    onChanged: (val) {
+                      setState(() {
+                        fullName = val;
+                      });
+                    },
+                    validator: (val) {
+                      if (val!.isEmpty) {
+                        return "Please enter your full name";
+                      } else {
+                        return null;
+                      }
+                    },
+                    decoration: textInputDecoration.copyWith(
+                      label: const Text('Full Name'),
+                      prefixIcon: const Icon(Icons.person, color: Colors.black),
+                      prefixIconColor: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     keyboardType: TextInputType.emailAddress,
                     onChanged: (val) {
@@ -89,34 +108,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
                   SimpleButton(
-                    text: 'Login',
+                    text: 'Register',
                     onPressed: () {
-                      _login();
+                      _register();
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(
+                    height: 16,
+                  ),
                   RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
-                      text: 'Don\'t have an account? ',
+                      text: 'Already have an account? ',
                       style: const TextStyle(color: Colors.black),
                       children: [
                         TextSpan(
-                          text: 'Register Here',
-                          style: const TextStyle(
-                            color: Colors.black,
+                          text: 'Login Now',
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.bold,
                           ),
-                          recognizer: TapGestureRecognizer()..onTap = () {
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ),
-                            );
-
-                          },
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.pop(context);
+                            },
                         ),
                       ],
                     ),
@@ -127,24 +142,20 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  _login() {
+  _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
       _authService
-          .signInUserWithEmailAndPassword(email, password)
+          .registerUserWithEmailAndPassword(fullName, email, password)
           .then((value) async {
         if (value == true) {
-          QuerySnapshot snapshot =
-              await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-                  .getUserData(email);
-
-          //save values to shared preferences
+          //save data to shared preferences
           await HelperFunctions.saveUserLoggedInStatus(true);
-          await HelperFunctions.saveUsername(snapshot.docs[0].get('fullName'));
-          await HelperFunctions.saveUserEmail(snapshot.docs[0].get('email'));
+          await HelperFunctions.saveUsername(fullName);
+          await HelperFunctions.saveUserEmail(email);
 
           if (mounted) {
             Navigator.pushReplacement(
@@ -156,7 +167,6 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         } else {
           Utils.showCustomSnackBar(context, value, ContentType.failure);
-
           setState(() {
             _isLoading = false;
           });

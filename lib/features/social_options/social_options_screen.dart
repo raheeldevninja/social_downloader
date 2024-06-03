@@ -1,7 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:social_downloader/core/helpers/helper_functions.dart';
 import 'package:social_downloader/core/helpers/permissions_helper.dart';
+import 'package:social_downloader/features/auth/login_screen.dart';
+import 'package:social_downloader/features/auth/services/auth_service.dart';
 import 'package:social_downloader/features/social_options/widgets/download_instagram_button.dart';
 import 'package:social_downloader/features/social_options/widgets/download_tiktok_button.dart';
 import 'package:social_downloader/features/social_options/widgets/download_twitter_button.dart';
@@ -15,6 +18,9 @@ class SocialOptionsScreen extends StatefulWidget {
 }
 
 class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
+
+  final _authService = AuthService();
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +39,27 @@ class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
             color: Colors.white,
           ),
         ),
+        actions: [
+
+
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: () async {
+              await HelperFunctions.saveUserLoggedInStatus(false);
+              await HelperFunctions.saveUsername("");
+              await HelperFunctions.saveUserEmail("");
+
+              _authService.signOut().whenComplete(() {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => const LoginScreen()),
+                      (route) => false,
+                );
+              });
+            },
+          ),
+
+        ],
       ),
       body: Center(
         child: Container(
