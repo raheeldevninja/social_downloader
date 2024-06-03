@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_downloader/core/helpers/dir_helper.dart';
 import 'package:social_downloader/core/helpers/permissions_helper.dart';
+import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/core/ui/custom_app_bar.dart';
 import 'package:social_downloader/core/ui/simple_button.dart';
 import 'package:social_downloader/features/download_videos/widgets/downloading_progress.dart';
@@ -54,7 +55,7 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
           children: [
             const SocialLogo(
               tag: 'tiktok',
-              logoPath: 'assets/icons/tiktok.svg',
+              logoPath: Images.tiktokImage,
             ),
             const SizedBox(height: 50),
             const Label(text: 'Paste TikTok Video Link'),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_downloader/core/helpers/dir_helper.dart';
+import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/core/ui/custom_app_bar.dart';
 import 'package:social_downloader/core/ui/simple_button.dart';
 import 'package:social_downloader/features/download_videos/widgets/downloading_progress.dart';
@@ -18,7 +19,6 @@ class DownloadTwitterScreen extends StatefulWidget {
 }
 
 class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -44,7 +44,7 @@ class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
           children: [
             const SocialLogo(
               tag: 'twitter',
-              logoPath: 'assets/icons/twitter.svg',
+              logoPath: Images.twitterImage,
               width: 100,
               height: 100,
             ),
@@ -53,7 +53,6 @@ class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
             const SizedBox(height: 10),
             const VideoLinkFieldPasteButton(hintText: 'Twitter video link'),
             const SizedBox(height: 16.0),
-
             //download button
             SimpleButton(
               text: 'Download',
@@ -78,11 +77,8 @@ class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
                       }
                     },
             ),
-
             const SizedBox(height: 20),
-
             if (downloadSaveProvider.isLoading) const LoadingIndicator(),
-
             if (downloadSaveProvider.isDownloading)
               DownloadingProgress(progress: downloadSaveProvider.progress),
           ],

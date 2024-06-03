@@ -4,6 +4,7 @@ import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:social_downloader/core/helpers/dir_helper.dart';
+import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/core/ui/custom_app_bar.dart';
 import 'package:social_downloader/core/ui/simple_button.dart';
 import 'package:social_downloader/features/download_videos/widgets/downloading_progress.dart';
@@ -59,7 +60,7 @@ class _DownloadInstagramScreenState extends State<DownloadInstagramScreen> {
           children: [
             const SocialLogo(
               tag: 'instagram',
-              logoPath: 'assets/icons/instagram.svg',
+              logoPath: Images.instagramImage,
               width: 100,
               height: 100,
               color: Colors.white,

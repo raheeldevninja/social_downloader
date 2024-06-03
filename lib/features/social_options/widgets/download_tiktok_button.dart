@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/features/download_videos/download_tik_tok_screen.dart';
 
 class DownloadTiktokButton extends StatelessWidget {
@@ -67,7 +68,7 @@ class DownloadTiktokButton extends StatelessWidget {
               child: SvgPicture.asset(
                 width: 60,
                 height: 60,
-                'assets/icons/tiktok.svg',
+                Images.tiktokImage,
                 color: Colors.black,
               ),
             ),

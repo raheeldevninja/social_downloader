@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/features/download_videos/download_instagram_screen.dart';
 
 class DownloadInstagramButton extends StatelessWidget {
@@ -46,7 +47,7 @@ class DownloadInstagramButton extends StatelessWidget {
           child: SvgPicture.asset(
             width: 40,
             height: 40,
-            'assets/icons/instagram.svg',
+            Images.instagramImage,
             color: Colors.white,
           ),
         ),
