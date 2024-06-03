@@ -38,7 +38,7 @@ class _VideoLinkFieldPasteButtonState extends State<VideoLinkFieldPasteButton> {
               downloadSaveProvider.setVideoLink(value);
             },
             decoration: InputDecoration(
-              hintText: 'TikTok video link',
+              hintText: widget.hintText,
               //rounded corner border
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),

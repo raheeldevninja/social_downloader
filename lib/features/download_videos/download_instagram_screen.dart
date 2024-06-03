@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:social_downloader/core/helpers/dir_helper.dart';
 import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/core/ui/custom_app_bar.dart';
 import 'package:social_downloader/core/ui/simple_button.dart';
@@ -78,30 +76,31 @@ class _DownloadInstagramScreenState extends State<DownloadInstagramScreen> {
                   ? null
                   : () async {
                       if (downloadSaveProvider.getVideoLink.isNotEmpty) {
+
+                        //1. get instagram video details
                         await downloadSaveProvider.getInstagramVideo(
                           context,
                           downloadSaveProvider.getVideoLink.trim(),
                         );
 
-                        final path = await _getPathById(
-                            '${DateTime.now().millisecondsSinceEpoch}');
-
+                        //2
                         final tempPath = await getTemporaryDirectory();
 
                         //append file name
-                        final file = File(
-                            '${tempPath.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
+                        final file = File('${tempPath.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
 
                         print('new file path: ${file.path}');
 
-                        await downloadSaveProvider.downloadInstagramVideo(
-                          context,
-                          downloadSaveProvider.media,
-                          //path,
-                          file.path,
-                        );
 
-                        await GallerySaver.saveVideo(file.path);
+                        //3. download instagram video
+                        if(context.mounted) {
+                          await downloadSaveProvider.downloadInstagramVideo(
+                            context,
+                            downloadSaveProvider.media,
+                            file.path,
+                          );
+                        }
+
                       }
                     },
             ),
@@ -115,11 +114,6 @@ class _DownloadInstagramScreenState extends State<DownloadInstagramScreen> {
         ),
       ),
     );
-  }
-
-  Future<String> _getPathById(String id) async {
-    final appPath = await DirHelper.getAppPath();
-    return "$appPath/$id.mp4";
   }
 
   _clearVideoLink() {

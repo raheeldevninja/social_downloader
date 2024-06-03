@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:social_downloader/core/helpers/dir_helper.dart';
 import 'package:social_downloader/core/helpers/permissions_helper.dart';
 import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/core/ui/custom_app_bar.dart';
@@ -77,28 +79,32 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
                     return;
                   }*/
 
-                        /*final appPath = await DirHelper.getAppPath();
 
-                  downloadSaveProvider.downloadTikTokVideo(
-                    _tikTokVideoLinkController.text.trim(),
-                    '$appPath/${DateTime.now().millisecondsSinceEpoch}.mp4',
-                  );*/
-
+                        //1. get tiktok video details
                         await downloadSaveProvider.getTikTokVideo(
                           context,
                           downloadSaveProvider.getVideoLink.trim(),
                         );
 
-                        final path =
-                            await _getPathById(downloadSaveProvider.id);
 
+                        //2
+                        final tempPath = await getTemporaryDirectory();
+
+                        //append file name
+                        final file = File('${tempPath.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
+
+                        print('file path: ${file.path}');
+
+
+                        //3. download tiktok video
                         if (context.mounted) {
                           await downloadSaveProvider.downloadTikTokVideo(
                             context,
                             downloadSaveProvider.linkrwm,
-                            path,
+                            file.path,
                           );
                         }
+
                       }
                     },
             ),
@@ -114,11 +120,6 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
         ),
       ),
     );
-  }
-
-  Future<String> _getPathById(String id) async {
-    final appPath = await DirHelper.getAppPath();
-    return "$appPath/$id.mp4";
   }
 
   _clearVideoLink() {

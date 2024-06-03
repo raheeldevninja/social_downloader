@@ -125,17 +125,10 @@ class DownloadSaveProvider extends ChangeNotifier {
     try {
       Dio dio = Dio();
 
-      /*final directory = await getExternalStorageDirectory();
-      final filePath = '${directory!.path}/$fileName';*/
-
-      //print('filePath in provider: $filePath');
-      print('fileName in provider: $fileName');
-
       dio.options.receiveDataWhenStatusError = true;
 
       await dio.download(
         url,
-        //filePath,
         fileName,
         onReceiveProgress: (received, total) {
           if (total != -1) {
@@ -151,8 +144,6 @@ class DownloadSaveProvider extends ChangeNotifier {
 
         ),
       );
-
-
 
       await GallerySaver.saveVideo(fileName);
 
@@ -262,17 +253,10 @@ class DownloadSaveProvider extends ChangeNotifier {
     try {
       Dio dio = Dio();
 
-      /*final directory = await getExternalStorageDirectory();
-      final filePath = '${directory!.path}/$fileName';*/
-
-      //print('filePath in provider: $filePath');
-      print('fileName in provider: $fileName');
-
       dio.options.receiveDataWhenStatusError = true;
 
       await dio.download(
         url,
-        //filePath,
         fileName,
         onReceiveProgress: (received, total) {
           if (total != -1) {
@@ -287,7 +271,6 @@ class DownloadSaveProvider extends ChangeNotifier {
           },
         ),
       );
-
 
       await GallerySaver.saveVideo(fileName);
 
@@ -381,17 +364,10 @@ class DownloadSaveProvider extends ChangeNotifier {
     try {
       Dio dio = Dio();
 
-      /*final directory = await getExternalStorageDirectory();
-      final filePath = '${directory!.path}/$fileName';*/
-
-      //print('filePath in provider: $filePath');
-      print('fileName in provider: $fileName');
-
       dio.options.receiveDataWhenStatusError = true;
 
       await dio.download(
         url,
-        //filePath,
         fileName,
         onReceiveProgress: (received, total) {
           if (total != -1) {
