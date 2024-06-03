@@ -5,9 +5,11 @@ import 'package:social_downloader/features/view_model/download_save_provider.dar
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     required this.title,
+    this.shouldShowBack = true,
     super.key});
 
   final String title;
+  final bool shouldShowBack;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       iconTheme: const IconThemeData(
         color: Colors.white,
       ),
-      leading: IconButton(
+      leadingWidth: shouldShowBack ? 40 : 0,
+      leading: shouldShowBack ? IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
 
@@ -29,7 +32,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           Navigator.pop(context);
 
         },
-      ),
+      ) : const SizedBox(),
       title: Text(
         title,
         style: const TextStyle(
