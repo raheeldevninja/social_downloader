@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:social_downloader/core/helpers/permissions_helper.dart';
 import 'package:social_downloader/features/social_options/widgets/download_instagram_button.dart';
@@ -15,18 +17,9 @@ class SocialOptionsScreen extends StatefulWidget {
 class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _permission();
-  }
-
-  _permission() async {
-    bool checkPermissions = await PermissionsHelper.checkPermission();
-
-    if (!checkPermissions) {
-      print('you dont have permission ');
-    }
   }
 
   @override
@@ -67,4 +60,13 @@ class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
       ),
     );
   }
+
+  _permission() async {
+    bool checkPermissions = await PermissionsHelper.checkPermission();
+
+    if (!checkPermissions) {
+      log('you don\'t have permission');
+    }
+  }
+
 }

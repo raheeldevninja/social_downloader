@@ -22,7 +22,6 @@ class DownloadTikTokScreen extends StatefulWidget {
 }
 
 class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -30,7 +29,6 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _clearVideoLink();
     });
-
   }
 
   @override
@@ -72,13 +70,6 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
                   ? null
                   : () async {
                       if (downloadSaveProvider.getVideoLink.isNotEmpty) {
-                        /*bool checkPermissions =
-                      await PermissionsHelper.checkPermission();
-
-                  if (!checkPermissions) {
-                    return;
-                  }*/
-
 
                         //1. get tiktok video details
                         await downloadSaveProvider.getTikTokVideo(
@@ -86,15 +77,14 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
                           downloadSaveProvider.getVideoLink.trim(),
                         );
 
-
                         //2
                         final tempPath = await getTemporaryDirectory();
 
                         //append file name
-                        final file = File('${tempPath.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
+                        final file = File(
+                            '${tempPath.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
 
                         print('file path: ${file.path}');
-
 
                         //3. download tiktok video
                         if (context.mounted) {
@@ -104,18 +94,15 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
                             file.path,
                           );
                         }
-
                       }
                     },
             ),
             const SizedBox(height: 20),
 
-            if (downloadSaveProvider.isLoading)
-              const LoadingIndicator(),
+            if (downloadSaveProvider.isLoading) const LoadingIndicator(),
 
             if (downloadSaveProvider.isDownloading)
               DownloadingProgress(progress: downloadSaveProvider.progress),
-
           ],
         ),
       ),
@@ -123,8 +110,8 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
   }
 
   _clearVideoLink() {
-    final downloadSaveProvider = Provider.of<DownloadSaveProvider>(context, listen: false);
+    final downloadSaveProvider =
+        Provider.of<DownloadSaveProvider>(context, listen: false);
     downloadSaveProvider.setVideoLink('');
   }
-
 }
