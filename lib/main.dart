@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social_downloader/features/social_options/social_options_screen.dart';
+import 'package:social_downloader/features/view_model/download_save_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => DownloadSaveProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -21,4 +30,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

@@ -1,10 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:social_downloader/features/download_videos/download_instagram_screen.dart';
-import 'package:social_downloader/features/download_videos/download_tik_tok_screen.dart';
-import 'package:social_downloader/features/download_videos/download_twitter_screen.dart';
+import 'package:social_downloader/core/helpers/permissions_helper.dart';
+import 'package:social_downloader/features/social_options/widgets/download_instagram_button.dart';
+import 'package:social_downloader/features/social_options/widgets/download_tiktok_button.dart';
+import 'package:social_downloader/features/social_options/widgets/download_twitter_button.dart';
+import 'package:social_downloader/features/social_options/widgets/previously_downloaded_button.dart';
 
-class SocialOptionsScreen extends StatelessWidget {
+class SocialOptionsScreen extends StatefulWidget {
   const SocialOptionsScreen({super.key});
+
+  @override
+  State<SocialOptionsScreen> createState() => _SocialOptionsScreenState();
+}
+
+class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _permission();
+  }
+
+  _permission() async {
+    bool checkPermissions = await PermissionsHelper.checkPermission();
+
+    if (!checkPermissions) {
+      print('you dont have permission ');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,87 +41,26 @@ class SocialOptionsScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Center(
+      body: const Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                  ),
-                  onPressed: () {
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DownloadTikTokScreen(),
-                      ),
-                    );
+              //download tiktok button
+              DownloadTiktokButton(),
+              SizedBox(height: 8),
+              //instagram button
+              DownloadInstagramButton(),
+              SizedBox(height: 8),
+              //twitter button
+              DownloadTwitterButton(),
+              SizedBox(height: 8),
+              //previously downloaded button
+              PreviouslyDownloadedButton(),
 
-                  },
-                  child: const Text(
-                    'Download TikTok Videos',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pinkAccent,
-                  ),
-                  onPressed: () {
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DownloadInstagramScreen(),
-                      ),
-                    );
-
-                  },
-                  child: const Text(
-                    'Download Instagram Videos',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DownloadTwitterScreen(),
-                      ),
-                    );
-
-                  },
-                  child: const Text(
-                    'Download Twitter Videos',
-                    style: TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
