@@ -5,12 +5,14 @@ import 'package:provider/provider.dart';
 import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/core/ui/custom_app_bar.dart';
 import 'package:social_downloader/core/ui/simple_button.dart';
+import 'package:social_downloader/core/utils/utils.dart';
 import 'package:social_downloader/features/download_videos/widgets/downloading_progress.dart';
 import 'package:social_downloader/features/download_videos/widgets/label.dart';
 import 'package:social_downloader/features/download_videos/widgets/loading_indicator.dart';
 import 'package:social_downloader/features/download_videos/widgets/social_logo.dart';
 import 'package:social_downloader/features/download_videos/widgets/video_link_field_paste_button.dart';
 import 'package:social_downloader/features/view_model/download_save_provider.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class DownloadInstagramScreen extends StatefulWidget {
   const DownloadInstagramScreen({super.key});
@@ -75,6 +77,21 @@ class _DownloadInstagramScreenState extends State<DownloadInstagramScreen> {
                       downloadSaveProvider.isDownloading
                   ? null
                   : () async {
+
+                      //check internet connection
+                      bool isInternetConnected = await Utils.checkInternetConnection();
+
+                      if (!isInternetConnected) {
+                        Utils.showCustomSnackBar(
+                          context,
+                          'Not connected to internet',
+                          ContentType.failure,
+                        );
+
+                        return;
+                      }
+
+
                       if (downloadSaveProvider.getVideoLink.isNotEmpty) {
 
                         //1. get instagram video details
@@ -83,23 +100,27 @@ class _DownloadInstagramScreenState extends State<DownloadInstagramScreen> {
                           downloadSaveProvider.getVideoLink.trim(),
                         );
 
-                        //2
-                        final tempPath = await getTemporaryDirectory();
 
-                        //append file name
-                        final file = File('${tempPath.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
+                        if(downloadSaveProvider.media.isNotEmpty) {
+                          //2
+                          final tempPath = await getTemporaryDirectory();
 
-                        print('new file path: ${file.path}');
+                          //append file name
+                          final file = File('${tempPath.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
+
+                          print('new file path: ${file.path}');
 
 
-                        //3. download instagram video
-                        if(context.mounted) {
-                          await downloadSaveProvider.downloadInstagramVideo(
-                            context,
-                            downloadSaveProvider.media,
-                            file.path,
-                          );
+                          //3. download instagram video
+                          if(context.mounted) {
+                            await downloadSaveProvider.downloadInstagramVideo(
+                              context,
+                              downloadSaveProvider.media,
+                              file.path,
+                            );
+                          }
                         }
+
 
                       }
                     },

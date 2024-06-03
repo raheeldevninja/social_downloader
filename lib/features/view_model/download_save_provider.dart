@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -34,11 +36,10 @@ class DownloadSaveProvider extends ChangeNotifier {
 
   String get getVideoLink => videoLink;
 
-  //List<VideoItem> oldDownloads = [];
-
   //get tiktok video
   Future<void> getTikTokVideo(BuildContext context, String videoUrl) async {
 
+    linkrwm = '';
     _isLoading = true;
     notifyListeners();
 
@@ -84,9 +85,6 @@ class DownloadSaveProvider extends ChangeNotifier {
 
         log(json.encode(response.data));
 
-        print('link: ${response.data['link']}');
-        print('id: ${response.data['data']['id']}');
-
         link = response.data['link'];
         id = response.data['data']['id'];
         linkrwm = response.data['data']['video_link_nwm'];
@@ -96,36 +94,101 @@ class DownloadSaveProvider extends ChangeNotifier {
 
       }
       else {
-        print(response.statusMessage);
+        _isLoading = false;
+        notifyListeners();
       }
 
     }
-    catch(e) {
+    on DioException catch(e) {
 
-      Utils.showCustomSnackBar(
-        context,
-        'Failed to get video !',
-        ContentType.failure,
-      );
+      if(e is DioExceptionType) {
+        if(e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
 
-      _isLoading = false;
-      notifyListeners();
-      throw Exception('Failed to get video: $e');
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Time out error, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isLoading = false;
+          notifyListeners();
+        }
+        else if(e.type == DioExceptionType.cancel) {
+
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Request was cancelled, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isLoading = false;
+          notifyListeners();
+        }
+        else if(e.type == DioExceptionType.unknown) {
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Failed to get video!',
+              ContentType.failure,
+            );
+          }
+
+          _isLoading = false;
+          notifyListeners();
+        }
+
+      }
+      else if(e is SocketException) {
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Not connected to internet',
+            ContentType.failure,
+          );
+        }
+
+        _isLoading = false;
+        notifyListeners();
+
+      }
+      else {
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Failed to get video !',
+            ContentType.failure,
+          );
+        }
+
+        _isLoading = false;
+        notifyListeners();
+
+      }
+
 
     }
 
 
   }
 
+  //download tiktok video
   Future<void> downloadTikTokVideo(BuildContext context, String url, String fileName) async {
+
     _isDownloading = true;
     _progress = 0;
+
     notifyListeners();
 
     try {
       Dio dio = Dio();
-
-      dio.options.receiveDataWhenStatusError = true;
 
       await dio.download(
         url,
@@ -133,6 +196,10 @@ class DownloadSaveProvider extends ChangeNotifier {
         onReceiveProgress: (received, total) {
           if (total != -1) {
             _progress = received / total;
+            notifyListeners();
+          }
+          else {
+            _isDownloading = false;
             notifyListeners();
           }
         },
@@ -147,29 +214,91 @@ class DownloadSaveProvider extends ChangeNotifier {
 
       await GallerySaver.saveVideo(fileName);
 
-      Utils.showCustomSnackBar(
-        context,
-        'Download Completed',
-        ContentType.success,
-      );
-
-
+      if(context.mounted) {
+        Utils.showCustomSnackBar(
+          context,
+          'Download Completed',
+          ContentType.success,
+        );
+      }
 
       _isDownloading = false;
       notifyListeners();
-    } catch (e) {
-      _isDownloading = false;
-      notifyListeners();
-      throw Exception('Failed to download video: $e');
+
     }
+    on DioException catch(e) {
+
+      if(e is DioExceptionType) {
+        if(e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout ) {
+
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Time out error, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isDownloading = false;
+          notifyListeners();
+        }
+        else if(e.type == DioExceptionType.cancel) {
+
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Request was cancelled, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isDownloading = false;
+          notifyListeners();
+        }
+
+      }
+      else if(e.error is SocketException) {
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Not connected to internet',
+            ContentType.failure,
+          );
+        }
+
+        _isDownloading = false;
+        notifyListeners();
+
+      }
+      else {
+
+        print('dio error: ${e.toString()}');
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Failed to download video!',
+            ContentType.failure,
+          );
+        }
+
+        _isDownloading = false;
+        notifyListeners();
+
+      }
+    }
+
   }
 
   //get instagram video
   Future<void> getInstagramVideo(BuildContext context, String videoUrl) async {
 
+    media = '';
     _isLoading = true;
     notifyListeners();
-
 
     String completeUrl = 'https://instagram-downloader-download-instagram-videos-stories.p.rapidapi.com/index?url=$videoUrl';
 
@@ -228,22 +357,83 @@ class DownloadSaveProvider extends ChangeNotifier {
       }
 
     }
-    catch(e) {
+    on DioException catch(e) {
 
-      Utils.showCustomSnackBar(
-        context,
-        'Failed to get video !',
-        ContentType.failure,
-      );
+      if(e is DioExceptionType) {
+        if(e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
 
-      _isLoading = false;
-      notifyListeners();
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Time out error, Try again later',
+              ContentType.failure,
+            );
+          }
 
-      throw Exception('Failed to get video: $e');
+          _isLoading = false;
+          notifyListeners();
+        }
+        else if(e.type == DioExceptionType.cancel) {
+
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Request was cancelled, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isLoading = false;
+          notifyListeners();
+        }
+        else if(e.type == DioExceptionType.unknown) {
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Failed to get video!',
+              ContentType.failure,
+            );
+          }
+
+          _isLoading = false;
+          notifyListeners();
+        }
+
+      }
+      else if(e is SocketException) {
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Not connected to internet',
+            ContentType.failure,
+          );
+        }
+
+        _isLoading = false;
+        notifyListeners();
+
+      }
+      else {
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Failed to get video !',
+            ContentType.failure,
+          );
+        }
+
+        _isLoading = false;
+        notifyListeners();
+      }
     }
 
   }
 
+  //download instagram video
   Future<void> downloadInstagramVideo(BuildContext context, String url, String fileName) async {
 
     _isDownloading = true;
@@ -283,15 +473,79 @@ class DownloadSaveProvider extends ChangeNotifier {
 
       _isDownloading = false;
       notifyListeners();
-    } catch (e) {
-      _isDownloading = false;
-      notifyListeners();
-      throw Exception('Failed to download video: $e');
     }
+    on DioException catch(e) {
+
+      if(e is DioExceptionType) {
+        if(e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout ) {
+
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Time out error, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isDownloading = false;
+          notifyListeners();
+        }
+        else if(e.type == DioExceptionType.cancel) {
+
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Request was cancelled, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isDownloading = false;
+          notifyListeners();
+        }
+
+      }
+      else if(e.error is SocketException) {
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Not connected to internet',
+            ContentType.failure,
+          );
+        }
+
+        _isDownloading = false;
+        notifyListeners();
+
+      }
+      else {
+
+        print('dio error: ${e.toString()}');
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Failed to download video!',
+            ContentType.failure,
+          );
+        }
+
+        _isDownloading = false;
+        notifyListeners();
+
+      }
+
+    }
+
   }
 
+  //get twitter video
   Future<void> getTwitterVideo(BuildContext context, String videoUrl) async {
 
+    media = '';
     _isLoading = true;
     notifyListeners();
 
@@ -319,9 +573,9 @@ class DownloadSaveProvider extends ChangeNotifier {
       log('get twitter video response: ${response.data}');
 
       if (response.statusCode == 200) {
+
         log(json.encode(response.data));
 
-        print('media: ${response.data['media'][0][0]}');
         media = response.data['media'][0][0];
 
         _isLoading = false;
@@ -337,24 +591,85 @@ class DownloadSaveProvider extends ChangeNotifier {
       }
 
     }
-    catch(e) {
+    on DioException catch(e) {
 
-      Utils.showCustomSnackBar(
-        context,
-        'Failed to get video !',
-        ContentType.failure,
-      );
+      if(e is DioExceptionType) {
+        if(e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
 
-      _isLoading = false;
-      notifyListeners();
-      throw Exception('Failed to get video: $e');
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Time out error, Try again later',
+              ContentType.failure,
+            );
+          }
 
+          _isLoading = false;
+          notifyListeners();
+        }
+        else if(e.type == DioExceptionType.cancel) {
+
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Request was cancelled, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isLoading = false;
+          notifyListeners();
+        }
+        else if(e.type == DioExceptionType.unknown) {
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Failed to get video!',
+              ContentType.failure,
+            );
+          }
+
+          _isLoading = false;
+          notifyListeners();
+        }
+
+      }
+      else if(e is SocketException) {
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Not connected to internet',
+            ContentType.failure,
+          );
+        }
+
+        _isLoading = false;
+        notifyListeners();
+
+      }
+      else {
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Failed to get video !',
+            ContentType.failure,
+          );
+        }
+
+        _isLoading = false;
+        notifyListeners();
+
+      }
     }
-
 
 
   }
 
+  //download twitter video
   Future<void> downloadTwitterVideo(BuildContext context, String url, String fileName) async {
 
     _isDownloading = true;
@@ -395,11 +710,74 @@ class DownloadSaveProvider extends ChangeNotifier {
       _isDownloading = false;
       notifyListeners();
 
-    } catch (e) {
-      _isDownloading = false;
-      notifyListeners();
-      throw Exception('Failed to download video: $e');
     }
+    on DioException catch(e) {
+
+      if(e is DioExceptionType) {
+        if(e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout ) {
+
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Time out error, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isDownloading = false;
+          notifyListeners();
+        }
+        else if(e.type == DioExceptionType.cancel) {
+
+          if(context.mounted) {
+            Utils.showCustomSnackBar(
+              context,
+              'Request was cancelled, Try again later',
+              ContentType.failure,
+            );
+          }
+
+          _isDownloading = false;
+          notifyListeners();
+        }
+
+      }
+      else if(e.error is SocketException) {
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Not connected to internet',
+            ContentType.failure,
+          );
+        }
+
+        _isDownloading = false;
+        notifyListeners();
+
+      }
+      else {
+
+        print('dio error: ${e.toString()}');
+
+        if(context.mounted) {
+          Utils.showCustomSnackBar(
+            context,
+            'Failed to download video!',
+            ContentType.failure,
+          );
+        }
+
+        _isDownloading = false;
+        notifyListeners();
+      }
+
+    }
+
+
+
   }
 
 

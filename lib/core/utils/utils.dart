@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class Utils {
 
@@ -23,5 +22,12 @@ class Utils {
       ..hideCurrentSnackBar()
       ..showSnackBar(snackBar);
   }
+
+  //check internet connection
+  static Future<bool> checkInternetConnection() async {
+    final result = await InternetConnectionChecker().hasConnection;
+    return result;
+  }
+
 
 }
