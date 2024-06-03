@@ -42,7 +42,17 @@ class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
       body: Container(
         padding: const EdgeInsets.all(24.0),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+
+              Color(0xFF1DA1F2),
+              Color(0xFF1DA1F2),
+              Color(0x401DA1F2),
+
+            ],
+          ),
         ),
         child: ListView(
           children: [

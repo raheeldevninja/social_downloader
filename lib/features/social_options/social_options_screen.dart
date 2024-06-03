@@ -34,12 +34,25 @@ class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
           ),
         ),
       ),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24.0),
-          child: Column(
+      body: Center(
+        child: Container(
+          padding: const EdgeInsets.all(24.0),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFFFFFFF),
+                Color(0xA15851DB),
+                Color(0xA15851DB),
+                Color(0xFF5851DB),
+                Color(0xFF405DE6),
+              ],
+            ),
+          ),
+          child: const Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
 
               //download tiktok button
