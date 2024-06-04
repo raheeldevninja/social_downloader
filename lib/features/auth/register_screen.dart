@@ -24,6 +24,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String password = '';
 
   bool _isLoading = false;
+  bool _obscureText = true;
+
 
   final _authService = AuthService();
 
@@ -35,9 +37,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         shouldShowBack: true,
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
-              color: Theme.of(context).primaryColor,
+              color: Colors.black,
             ))
           : Form(
         key: _formKey,
@@ -89,7 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     keyboardType: TextInputType.text,
-                    obscureText: true,
+                    obscureText: _obscureText,
                     onChanged: (val) {
                       setState(() {
                         password = val;
@@ -104,6 +106,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       label: const Text('Password'),
                       prefixIcon: const Icon(Icons.lock, color: Colors.black),
                       prefixIconColor: Theme.of(context).primaryColor,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.black,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),

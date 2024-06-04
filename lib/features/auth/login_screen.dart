@@ -27,6 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String password = '';
 
   bool _isLoading = false;
+  bool _obscureText = true;
 
   final _authService = AuthService();
 
@@ -70,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     keyboardType: TextInputType.text,
-                    obscureText: true,
+                    obscureText: _obscureText,
                     onChanged: (val) {
                       setState(() {
                         password = val;
@@ -85,12 +86,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       label: const Text('Password'),
                       prefixIcon: const Icon(Icons.lock, color: Colors.black),
                       prefixIconColor: Theme.of(context).primaryColor,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.black,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   SimpleButton(
                     text: 'Login',
-                    onPressed: () {
+                    onPressed: _isLoading ? null : () {
                       _login();
                     },
                   ),
@@ -128,7 +142,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _login() {
+
     if (_formKey.currentState!.validate()) {
+
       setState(() {
         _isLoading = true;
       });
@@ -136,6 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _authService
           .signInUserWithEmailAndPassword(email, password)
           .then((value) async {
+
         if (value == true) {
           QuerySnapshot snapshot =
               await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
@@ -161,7 +178,9 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading = false;
           });
         }
+
       });
+
     }
   }
 }
