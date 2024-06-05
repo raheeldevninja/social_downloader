@@ -26,7 +26,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+              'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -50,19 +53,11 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAUpXuEKpwTnPosPuVgHkcey5x7xmjSVME',
-    appId: '1:638248896763:android:263d5d5fca8a92251dc85e',
-    messagingSenderId: '638248896763',
-    projectId: 'social-downloader-255f2',
-    storageBucket: 'social-downloader-255f2.appspot.com',
+    apiKey: "AIzaSyCr8fWWSkR_zyVLiMqXMGu9dJLZ1KRKKcw",
+    appId: '1:1036305656515:android:135562c976e89710e2d076',
+    messagingSenderId: "1036305656515",
+    projectId: 'saveinsta-5ea6b',
+    storageBucket: "saveinsta-5ea6b.appspot.com",
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBDWpYg0wIQY37V5i5JhSV0ZJTI5GwIK9w',
-    appId: '1:638248896763:ios:358eb8f8e7a097861dc85e',
-    messagingSenderId: '638248896763',
-    projectId: 'social-downloader-255f2',
-    storageBucket: 'social-downloader-255f2.appspot.com',
-    iosBundleId: 'com.social.downloader.socialDownloader',
-  );
 }

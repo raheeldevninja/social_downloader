@@ -1,4 +1,4 @@
-package com.social.downloader.social_downloader
+package com.uksoft.saveinsta
 
 import io.flutter.embedding.android.FlutterActivity
 
