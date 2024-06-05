@@ -1,11 +1,7 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:social_downloader/core/helpers/helper_functions.dart';
 import 'package:social_downloader/core/helpers/permissions_helper.dart';
-import 'package:social_downloader/core/ui/dialogs.dart';
-import 'package:social_downloader/features/auth/login_screen.dart';
-import 'package:social_downloader/features/auth/services/auth_service.dart';
+import 'package:social_downloader/core/ui/app_drawer.dart';
 import 'package:social_downloader/features/social_options/widgets/download_instagram_button.dart';
 import 'package:social_downloader/features/social_options/widgets/download_tiktok_button.dart';
 import 'package:social_downloader/features/social_options/widgets/download_twitter_button.dart';
@@ -20,7 +16,7 @@ class SocialOptionsScreen extends StatefulWidget {
 
 class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
 
-  final _authService = AuthService();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -32,42 +28,23 @@ class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.white),
+          onPressed: () {
+            _scaffoldKey.currentState!.openDrawer();
+          },
+        ),
         title: const Text(
           'Social Options',
           style: TextStyle(
             color: Colors.white,
           ),
         ),
-        leadingWidth: 0,
-        actions: [
-
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () async {
-
-              bool result = await Dialogs.showLogoutDialog(context);
-
-              if(!result) {
-                return;
-              }
-
-              await HelperFunctions.saveUserLoggedInStatus(false);
-              await HelperFunctions.saveUsername("");
-              await HelperFunctions.saveUserEmail("");
-
-              _authService.signOut().whenComplete(() {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (context) => const LoginScreen()),
-                      (route) => false,
-                );
-              });
-            },
-          ),
-
-        ],
+        centerTitle: true,
       ),
       body: Center(
         child: Container(
