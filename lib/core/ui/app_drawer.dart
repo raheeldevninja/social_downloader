@@ -198,8 +198,18 @@ class AppDrawer extends StatelessWidget {
               child: RoundedButton(
                 backgroundColor: Colors.red,
                 icon: Icons.delete_outline,
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context);
+
+                  bool result = await Dialogs.showDeleteAccountDialog(context);
+
+                  if (!result) {
+                    return;
+                  }
+
+
+
+
                 },
                 text: 'Delete Account',
               ),

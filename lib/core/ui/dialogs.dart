@@ -13,6 +13,15 @@ sealed class Dialogs {
     );
   }
 
+  static Future<bool> showDeleteAccountDialog(BuildContext context) {
+    return _showConfirmDialog(
+      context,
+      title: 'Delete Account',
+      message: 'Are you sure you want to delete your account?',
+      confirmText: 'Delete',
+    );
+  }
+
   static Future<bool> _showConfirmDialog(
       BuildContext context, {
         required String title,
