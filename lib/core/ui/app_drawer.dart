@@ -11,9 +11,15 @@ import 'package:social_downloader/features/download_videos/download_tik_tok_scre
 import 'package:social_downloader/features/download_videos/download_twitter_screen.dart';
 
 class AppDrawer extends StatelessWidget {
-  AppDrawer({super.key});
+  AppDrawer({
+    required this.username,
+    required this.email,
+    super.key});
 
   final _authService = AuthService();
+
+  final String username;
+  final String email;
 
   @override
   Widget build(BuildContext context) {
@@ -42,34 +48,30 @@ class AppDrawer extends StatelessWidget {
                     color: Colors.black.withOpacity(0.7),
                   ),
                   alignment: Alignment.center,
-                  child: const Column(
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CircleAvatar(
                         radius: 40,
                         backgroundColor: Colors.white,
-                        child: const Text(
-                          'SaveInsta',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Image.asset(
+                          Images.logoWithoutAppName,
                         ),
                       ),
-                      SizedBox(height: 10),
+
+                      const SizedBox(height: 10),
                       Text(
-                        'Username',
-                        style: TextStyle(
+                        username,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'test@gmail.com',
-                        style: TextStyle(
+                        email,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
@@ -163,7 +165,6 @@ class AppDrawer extends StatelessWidget {
                 backgroundColor: Colors.black,
                 icon: Icons.logout,
                 onPressed: () async {
-
                   bool result = await Dialogs.showLogoutDialog(context);
 
                   if (!result) {

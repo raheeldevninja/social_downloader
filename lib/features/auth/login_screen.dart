@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:social_downloader/core/helpers/helper_functions.dart';
+import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/core/ui/custom_app_bar.dart';
 import 'package:social_downloader/core/ui/input_decoration.dart';
 import 'package:social_downloader/core/ui/simple_button.dart';
@@ -48,6 +49,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20.0, vertical: 80),
                 children: [
+
+                  Image.asset(Images.logo, width: 140, height: 140),
+
+                  const SizedBox(height: 20),
+
                   TextFormField(
                     keyboardType: TextInputType.emailAddress,
                     onChanged: (val) {
