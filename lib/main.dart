@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:social_downloader/core/helpers/helper_functions.dart';
 import 'package:social_downloader/features/auth/login_screen.dart';
@@ -7,10 +8,13 @@ import 'package:social_downloader/features/social_options/social_options_screen.
 import 'package:social_downloader/features/view_model/download_save_provider.dart';
 import 'package:social_downloader/firebase_options.dart';
 
+import 'features/auth/auth_provider.dart';
+
 
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform
@@ -20,6 +24,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => DownloadSaveProvider()),
+        ChangeNotifierProvider(create: (context) => AuthProvider()),
       ],
       child: const MyApp(),
     ),

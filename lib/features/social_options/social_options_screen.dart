@@ -1,15 +1,17 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
+import 'package:social_downloader/core/helpers/ad_mob_service.dart';
 import 'package:social_downloader/core/helpers/helper_functions.dart';
 import 'package:social_downloader/core/helpers/permissions_helper.dart';
 import 'package:social_downloader/core/ui/app_drawer.dart';
+import 'package:social_downloader/features/auth/auth_provider.dart';
 import 'package:social_downloader/features/social_options/widgets/download_instagram_button.dart';
 import 'package:social_downloader/features/social_options/widgets/download_tiktok_button.dart';
 import 'package:social_downloader/features/social_options/widgets/download_twitter_button.dart';
 import 'package:social_downloader/features/social_options/widgets/previously_downloaded_button.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_android/webview_flutter_android.dart';
+
 
 class SocialOptionsScreen extends StatefulWidget {
   const SocialOptionsScreen({super.key});
@@ -20,10 +22,13 @@ class SocialOptionsScreen extends StatefulWidget {
 
 class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  late final WebViewController controller;
+
 
   String username = '';
   String email = '';
+
+  BannerAd? _bannerAdTop;
+  BannerAd? _bannerAdBottom;
 
   @override
   void initState() {
@@ -32,35 +37,18 @@ class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
     _permission();
     _getUserData();
 
-    createWebView();
-  }
-
-  void createWebView() async {
-    controller = WebViewController();
-    // 1. Enable JavaScript in the web view.
-    await controller.setJavaScriptMode(JavaScriptMode.unrestricted);
-
-    // 2. Enable third-party cookies for Android.
-    if (controller.platform is AndroidWebViewController) {
-      AndroidWebViewCookieManager cookieManager = AndroidWebViewCookieManager(
-          const PlatformWebViewCookieManagerCreationParams());
-      await cookieManager.setAcceptThirdPartyCookies(
-          controller.platform as AndroidWebViewController, true);
-    }
-
-    // 3. Register the web view.
-    await MobileAds.instance.registerWebView(controller);
-
-    //4. load url
-    await controller
-        .loadRequest(Uri.parse('https://webview-api-for-ads-test.glitch.me/'));
+    _createBannerAdTop();
+    _createBannerAdBottom();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       key: _scaffoldKey,
-      drawer: AppDrawer(username: username, email: email),
+      drawer: AppDrawer(parentContext: context, username: username, email: email),
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
@@ -78,8 +66,10 @@ class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
         centerTitle: true,
       ),
       body: Center(
-        child: Container(
-          padding: const EdgeInsets.all(24.0),
+        child: authProvider.getIsLoading ? const CircularProgressIndicator(color: Colors.black) :
+
+        Container(
+          //padding: const EdgeInsets.all(24.0),
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -93,31 +83,46 @@ class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
               ],
             ),
           ),
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
             children: [
 
-              //download tiktok button
-              DownloadTiktokButton(),
-              SizedBox(height: 8),
-              //instagram button
-              DownloadInstagramButton(),
-              SizedBox(height: 8),
-              //twitter button
-              DownloadTwitterButton(),
-              SizedBox(height: 8),
-              //previously downloaded button
-              PreviouslyDownloadedButton(),
+              _bannerAdTop == null ? const SizedBox() : SizedBox(
+                width: _bannerAdTop!.size.width.toDouble(),
+                height: _bannerAdTop!.size.height.toDouble(),
+                child: AdWidget(ad: _bannerAdTop!),
+              ),
+
+              const Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+
+                    //download tiktok button
+                    DownloadTiktokButton(),
+                    SizedBox(height: 8),
+                    //instagram button
+                    DownloadInstagramButton(),
+                    SizedBox(height: 8),
+                    //twitter button
+                    DownloadTwitterButton(),
+                    SizedBox(height: 8),
+                    //previously downloaded button
+                    PreviouslyDownloadedButton(),
+
+                  ],
+                ),
+              ),
 
             ],
           ),
         ),
       ),
-      bottomNavigationBar: SizedBox(
-        width: double.maxFinite,
-        height: 30,
-        child: WebViewWidget(controller: controller),
+      bottomNavigationBar: _bannerAdBottom == null ? const SizedBox() : SizedBox(
+        width: _bannerAdBottom!.size.width.toDouble(),
+        height: _bannerAdBottom!.size.height.toDouble(),
+        child: AdWidget(ad: _bannerAdBottom!),
       ),
     );
   }
@@ -143,6 +148,28 @@ class _SocialOptionsScreenState extends State<SocialOptionsScreen> {
       });
     });
 
+  }
+
+  _createBannerAdTop() {
+    _bannerAdTop = BannerAd(
+      size: AdSize.fullBanner,
+      adUnitId: AdMobService.bannerAdUnitId,
+      request: const AdRequest(),
+      listener: AdMobService.bannerAdListener,
+    )..load();
+
+    _bannerAdTop!.load();
+  }
+
+  _createBannerAdBottom() {
+    _bannerAdBottom = BannerAd(
+      size: AdSize.fullBanner,
+      adUnitId: AdMobService.bannerAdUnitId,
+      request: const AdRequest(),
+      listener: AdMobService.bannerAdListener,
+    )..load();
+
+    _bannerAdBottom!.load();
   }
 
 }

@@ -43,6 +43,21 @@
             android:name="com.google.android.gms.ads.INTEGRATION_MANAGER"
             android:value="webview"/>
 
+
+
+        <!--Test App ID-->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
+
+
+        <!--SaveInsta App ID-->
+        <!--<meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5509377841556322~2316220611"/>-->
+
+
+
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

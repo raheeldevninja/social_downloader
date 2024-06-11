@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:social_downloader/core/helpers/ad_mob_service.dart';
 import 'package:social_downloader/core/images/images.dart';
 import 'package:social_downloader/core/ui/custom_app_bar.dart';
 import 'package:social_downloader/core/ui/simple_button.dart';
@@ -23,12 +25,20 @@ class DownloadTwitterScreen extends StatefulWidget {
 }
 
 class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
+
+  BannerAd? _bannerAdTop;
+  BannerAd? _bannerAdBottom;
+
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _clearVideoLink();
+
+      _createBannerAdTop();
+      _createBannerAdBottom();
+
     });
   }
 
@@ -40,7 +50,6 @@ class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
       resizeToAvoidBottomInset: true,
       appBar: const CustomAppBar(title: 'Download Twitter Videos'),
       body: Container(
-        padding: const EdgeInsets.all(24.0),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -54,78 +63,101 @@ class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
             ],
           ),
         ),
-        child: ListView(
+        child: Column(
           children: [
-            const SocialLogo(
-              tag: 'twitter',
-              logoPath: Images.twitterImage,
-              width: 100,
-              height: 100,
+
+            _bannerAdTop == null ? const SizedBox() : SizedBox(
+              width: _bannerAdTop!.size.width.toDouble(),
+              height: _bannerAdTop!.size.height.toDouble(),
+              child: AdWidget(ad: _bannerAdTop!),
             ),
-            const SizedBox(height: 50),
-            const Label(text: 'Paste Twitter Video Link'),
-            const SizedBox(height: 10),
-            const VideoLinkFieldPasteButton(hintText: 'Twitter video link'),
-            const SizedBox(height: 16.0),
-            //download button
-            SimpleButton(
-              text: 'Download',
-              onPressed: downloadSaveProvider.isLoading ||
+
+
+            ListView(
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(24.0),
+              children: [
+
+
+                const SocialLogo(
+                  tag: 'twitter',
+                  logoPath: Images.twitterImage,
+                  width: 100,
+                  height: 100,
+                ),
+                const SizedBox(height: 50),
+                const Label(text: 'Paste Twitter Video Link'),
+                const SizedBox(height: 10),
+                const VideoLinkFieldPasteButton(hintText: 'Twitter video link'),
+                const SizedBox(height: 16.0),
+                //download button
+                SimpleButton(
+                  text: 'Download',
+                  onPressed: downloadSaveProvider.isLoading ||
                       downloadSaveProvider.isDownloading
-                  ? null
-                  : () async {
+                      ? null
+                      : () async {
 
-                      //check internet connection
-                      bool isInternetConnected = await Utils.checkInternetConnection();
+                    //check internet connection
+                    bool isInternetConnected = await Utils.checkInternetConnection();
 
-                      if (!isInternetConnected) {
-                        Utils.showCustomSnackBar(
-                          context,
-                          'Not connected to internet',
-                          ContentType.failure,
-                        );
+                    if (!isInternetConnected) {
+                      Utils.showCustomSnackBar(
+                        context,
+                        'Not connected to internet',
+                        ContentType.failure,
+                      );
 
-                        return;
-                      }
+                      return;
+                    }
 
-                      if (downloadSaveProvider.getVideoLink.isNotEmpty) {
+                    if (downloadSaveProvider.getVideoLink.isNotEmpty) {
 
-                        //1. get twitter video details
-                        await downloadSaveProvider.getTwitterVideo(
-                          context,
-                          downloadSaveProvider.getVideoLink.trim(),
-                        );
+                      //1. get twitter video details
+                      await downloadSaveProvider.getTwitterVideo(
+                        context,
+                        downloadSaveProvider.getVideoLink.trim(),
+                      );
 
-                        if(downloadSaveProvider.media.isNotEmpty) {
-                          //2. twitter video path
-                          final tempPath = await getTemporaryDirectory();
+                      if(downloadSaveProvider.media.isNotEmpty) {
+                        //2. twitter video path
+                        final tempPath = await getTemporaryDirectory();
 
-                          //append file name
-                          final file = File('${tempPath.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
+                        //append file name
+                        final file = File('${tempPath.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
 
-                          print('new file path: ${file.path}');
+                        print('new file path: ${file.path}');
 
 
-                          //3. download twitter video
-                          if(context.mounted) {
-                            await downloadSaveProvider.downloadTwitterVideo(
-                              context,
-                              downloadSaveProvider.media,
-                              file.path,
-                            );
-                          }
+                        //3. download twitter video
+                        if(context.mounted) {
+                          await downloadSaveProvider.downloadTwitterVideo(
+                            context,
+                            downloadSaveProvider.media,
+                            file.path,
+                          );
                         }
-
-
                       }
-                    },
+
+
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+                if (downloadSaveProvider.isLoading) const LoadingIndicator(),
+                if (downloadSaveProvider.isDownloading)
+                  DownloadingProgress(progress: downloadSaveProvider.progress),
+
+              ],
             ),
-            const SizedBox(height: 20),
-            if (downloadSaveProvider.isLoading) const LoadingIndicator(),
-            if (downloadSaveProvider.isDownloading)
-              DownloadingProgress(progress: downloadSaveProvider.progress),
+
           ],
         ),
+      ),
+      bottomNavigationBar: _bannerAdBottom == null ? const SizedBox() : SizedBox(
+        width: _bannerAdBottom!.size.width.toDouble(),
+        height: _bannerAdBottom!.size.height.toDouble(),
+        child: AdWidget(ad: _bannerAdBottom!),
       ),
     );
   }
@@ -135,4 +167,27 @@ class _DownloadTwitterScreenState extends State<DownloadTwitterScreen> {
         Provider.of<DownloadSaveProvider>(context, listen: false);
     downloadSaveProvider.setVideoLink('');
   }
+
+  _createBannerAdTop() {
+    _bannerAdTop = BannerAd(
+      size: AdSize.fullBanner,
+      adUnitId: AdMobService.bannerAdUnitId,
+      request: const AdRequest(),
+      listener: AdMobService.bannerAdListener,
+    )..load();
+
+    _bannerAdTop!.load();
+  }
+
+  _createBannerAdBottom() {
+    _bannerAdBottom = BannerAd(
+      size: AdSize.fullBanner,
+      adUnitId: AdMobService.bannerAdUnitId,
+      request: const AdRequest(),
+      listener: AdMobService.bannerAdListener,
+    )..load();
+
+    _bannerAdBottom!.load();
+  }
+
 }
