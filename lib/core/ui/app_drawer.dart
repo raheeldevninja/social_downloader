@@ -298,7 +298,8 @@ class AppDrawer extends StatelessWidget {
         await user.reauthenticateWithCredential(credential);
       }
       on SocketException {
-        Utils.showCustomSnackBar(context, 'Not connected to internet', ContentType.failure);
+        log('Not connected to internet');
+        rethrow;
       }
       on auth.FirebaseAuthException catch (e) {
         log('Error re-authenticating user: ${e.message}');
@@ -372,6 +373,17 @@ class AppDrawer extends StatelessWidget {
         );
       }
     }
+    on SocketException {
+      authProvider.hideLoading();
+
+      if(context.mounted) {
+        Utils.showCustomSnackBar(
+          context,
+          'Not connected to internet',
+          ContentType.failure,
+        );
+      }
+    }
     catch (e) {
       authProvider.hideLoading();
       
@@ -382,8 +394,6 @@ class AppDrawer extends StatelessWidget {
           ContentType.failure,
         );
       }
-
-
     }
   }
 
