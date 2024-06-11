@@ -300,13 +300,13 @@ class AppDrawer extends StatelessWidget {
       on SocketException {
         Utils.showCustomSnackBar(context, 'Not connected to internet', ContentType.failure);
       }
-      //on auth.FirebaseAuthException catch (e) {
-        //log('Error re-authenticating user: ${e.message}');
-        //Utils.showCustomSnackBar(context, e.message ?? 'Error re-authenticating user', ContentType.failure);
-        //rethrow;
-      //}
+      on auth.FirebaseAuthException catch (e) {
+        log('Error re-authenticating user: ${e.message}');
+        rethrow;
+      }
       catch (e) {
-        throw Exception("Re-authentication failed: $e");
+        log("General exception: $e");
+        rethrow;
       }
     }
   }
@@ -361,7 +361,7 @@ class AppDrawer extends StatelessWidget {
 
       }
     }
-    on auth.FirebaseAuthMultiFactorException catch(e) {
+    on auth.FirebaseAuthException catch(e) {
       authProvider.hideLoading();
 
       if(context.mounted) {
@@ -374,11 +374,7 @@ class AppDrawer extends StatelessWidget {
     }
     catch (e) {
       authProvider.hideLoading();
-
-
-      e is auth.FirebaseAuthException ? log('Error deleting user account: ${e.message}') :
-      log("Error deleting user account: $e");
-
+      
       if(context.mounted) {
         Utils.showCustomSnackBar(
           context,
