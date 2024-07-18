@@ -5,10 +5,10 @@ class AdMobService {
   static String get bannerAdUnitId {
 
     //test Ad Unit ID
-    return 'ca-app-pub-3940256099942544/6300978111';
+    //return 'ca-app-pub-3940256099942544/6300978111';
 
     //SaveInsta app Ad Unit ID
-    //return 'ca-app-pub-5509377841556322/3657507855';
+    return 'ca-app-pub-5509377841556322/3657507855';
   }
 
   static final BannerAdListener bannerAdListener = BannerAdListener(

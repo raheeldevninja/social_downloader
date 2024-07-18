@@ -41,7 +41,6 @@ class _DownloadTikTokScreenState extends State<DownloadTikTokScreen> {
       resizeToAvoidBottomInset: true,
       appBar: const CustomAppBar(title: 'Download TikTok Videos'),
       body: Container(
-
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,

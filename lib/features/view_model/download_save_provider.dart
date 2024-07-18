@@ -348,7 +348,12 @@ class DownloadSaveProvider extends ChangeNotifier {
         notifyListeners();
 
       }
+      else if(response.statusCode == 403) {
+        _isLoading = false;
+        notifyListeners();
+      }
       else {
+        print('hereeresfsdf');
         print(response.statusMessage);
 
         _isLoading = false;

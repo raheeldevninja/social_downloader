@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -172,26 +174,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _authService
           .registerUserWithEmailAndPassword(fullName, email, password)
           .then((value) async {
-        if (value == true) {
-          //save data to shared preferences
-          await HelperFunctions.saveUserLoggedInStatus(true);
-          await HelperFunctions.saveUsername(fullName);
-          await HelperFunctions.saveUserEmail(email);
 
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SocialOptionsScreen(),
-              ),
-            );
-          }
-        } else {
-          Utils.showCustomSnackBar(context, value, ContentType.failure);
-          setState(() {
-            _isLoading = false;
-          });
-        }
+            try {
+
+              if (value == true) {
+
+                //save data to shared preferences
+                await HelperFunctions.saveUsername(fullName);
+                await HelperFunctions.saveUserEmail(email);
+                await HelperFunctions.saveUserLoggedInStatus(true);
+
+                if (mounted) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SocialOptionsScreen(),
+                    ),
+                  );
+                }
+              } else {
+                Utils.showCustomSnackBar(context, value, ContentType.failure);
+                setState(() {
+                  _isLoading = false;
+                });
+              }
+
+            }
+            catch(e) {
+
+              log('Error: $e');
+
+              setState(() {
+                _isLoading = false;
+              });
+
+
+              Utils.showCustomSnackBar(context, e.toString(), ContentType.failure);
+            }
+
+
       });
     }
   }

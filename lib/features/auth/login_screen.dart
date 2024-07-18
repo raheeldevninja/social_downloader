@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -159,31 +161,48 @@ class _LoginScreenState extends State<LoginScreen> {
           .signInUserWithEmailAndPassword(email, password)
           .then((value) async {
 
-        if (value == true) {
-          QuerySnapshot snapshot =
-              await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-                  .getUserData(email);
+            try {
 
-          //save values to shared preferences
-          await HelperFunctions.saveUserLoggedInStatus(true);
-          await HelperFunctions.saveUsername(snapshot.docs[0].get('fullName'));
-          await HelperFunctions.saveUserEmail(snapshot.docs[0].get('email'));
+              if (value == true) {
 
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SocialOptionsScreen(),
-              ),
-            );
-          }
-        } else {
-          Utils.showCustomSnackBar(context, value, ContentType.failure);
+                QuerySnapshot snapshot =
+                await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+                    .getUserData(email);
 
-          setState(() {
-            _isLoading = false;
-          });
-        }
+
+                //save values to shared preferences
+                await HelperFunctions.saveUsername(snapshot.docs[0].get('fullName'));
+                await HelperFunctions.saveUserEmail(snapshot.docs[0].get('email'));
+                await HelperFunctions.saveUserLoggedInStatus(true);
+
+                if (mounted) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SocialOptionsScreen(),
+                    ),
+                  );
+                }
+              } else {
+                Utils.showCustomSnackBar(context, value, ContentType.failure);
+
+                setState(() {
+                  _isLoading = false;
+                });
+              }
+
+
+            }catch(e) {
+
+              setState(() {
+                _isLoading = false;
+              });
+
+              log('error: $e');
+
+              Utils.showCustomSnackBar(context, e.toString(), ContentType.failure);
+            }
+
 
       });
 

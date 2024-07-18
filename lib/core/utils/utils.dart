@@ -12,7 +12,7 @@ class Utils {
       behavior: SnackBarBehavior.floating,
       backgroundColor: Colors.transparent,
       content: AwesomeSnackbarContent(
-        title: 'Social Downloader',
+        title: 'SaveInsta',
         message: message,
         contentType: contentType,
       ),
